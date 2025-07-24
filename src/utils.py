@@ -46,3 +46,7 @@ def shapiro_test(modelo):
         print('Não se rejeita H0 - Distribuição aderente à normalidade')
     else:
         print('Rejeita-se H0 - Distribuição não aderente à normalidade')
+
+
+def objective(x, a, b, c, d, e, f):
+    return (a * x) + (b * x**2) + (c * x**3) + (d * x**4) + (e * x**5) + f
