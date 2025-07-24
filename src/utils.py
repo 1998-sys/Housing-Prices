@@ -3,7 +3,8 @@ import numpy as np
 import seaborn as sns
 from statstests.process import stepwise
 from statstests.tests import shapiro_francia
-
+import statsmodels.api as sm
+from scipy import stats
 
 def iqr(df, coluna):
     """
@@ -50,3 +51,26 @@ def shapiro_test(modelo):
 
 def objective(x, a, b, c, d, e, f):
     return (a * x) + (b * x**2) + (c * x**3) + (d * x**4) + (e * x**5) + f
+
+def breusch_pagan_test(modelo):
+
+    df = pd.DataFrame({'yhat':modelo.fittedvalues,
+                       'resid':modelo.resid})
+   
+    df['up'] = (np.square(df.resid))/np.sum(((np.square(df.resid))/df.shape[0]))
+   
+    modelo_aux = sm.OLS.from_formula('up ~ yhat', df).fit()
+   
+    anova_table = sm.stats.anova_lm(modelo_aux, typ=2)
+   
+    anova_table['sum_sq'] = anova_table['sum_sq']/2
+    
+    chisq = anova_table['sum_sq'].iloc[0]
+   
+    p_value = stats.chi2.pdf(chisq, 1)*2
+    
+    print(f"chisq: {chisq}")
+    
+    print(f"p-value: {p_value}")
+    
+    return chisq, p_value
